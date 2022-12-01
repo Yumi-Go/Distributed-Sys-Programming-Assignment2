@@ -20,12 +20,15 @@ class ClientThread(threading.Thread):
     def run(self):
         print("Connection from : ", clientAddress)
         while True:
+            # 2. receive module ID from client
             data = self.c_socket.recv(1024)
             if not data:
                 break
             module_id = data.decode()
             print("from client", module_id)
             if module_id in list(my_dictionary):
+                # print(list(my_dictionary))
+                # 3. send boolean value to client (for existence of module ID in dictionary)
                 self.c_socket.send(bytes('True', 'UTF-8'))
 
             # Add learning outcome
@@ -33,8 +36,8 @@ class ClientThread(threading.Thread):
             if not data:
                 break
             add_lo = data.decode()
-            my_dictionary[module_id][0].append(add_lo)
-            self.c_socket.send(bytes(my_dictionary[module_id][0], 'UTF-8'))
+            added_result = str(my_dictionary[module_id][0].append(add_lo))
+            self.c_socket.send(bytes(added_result, 'UTF-8'))
 
 
 

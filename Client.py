@@ -16,14 +16,20 @@ learning_outcome = "1. Evaluate and apply design patterns in the design and deve
 
 while response != 'X' or response != 'x':
 
-    # module ID
+    # 1. send module ID
     data_to_send_moduleID = input("What is the module id? ")
     sock.sendall(bytes(data_to_send_moduleID, 'UTF-8'))
 
     # learning outcomes
-    data = sock.recv(1024)
-    if data == "True":
+    # 2. receive true or false for existence of module ID in data dictionary
+    data = sock.recv(1024) # receive True or False
+    # print(data) # for check
+    # print(repr(data))
+
+    # 4. if client get True value from server / or not
+    if data:
         response = input("(L)earning Outcomes, (C)ourses, (A)ssessments or e(X)it? ")
+
         if response == 'L' or response == 'l':
             sock.sendall(bytes(data_to_send_moduleID, 'UTF-8'))
             print(learning_outcome)
