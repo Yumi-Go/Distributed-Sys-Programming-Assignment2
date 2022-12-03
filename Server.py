@@ -12,30 +12,44 @@ my_dictionary = {
             "Create a distributed object application using RMI, allowing client/server to communicate securely via interfaces and objects."
         ],
         [
-            "prog1",
-            "prog2"
+            "CR_KSDEV_8",
+            "CR_KDNET_8",
+            "CR_KCOMP_7"
         ],
         [
-            "assess1",
-            "assess2"
+            "Project (An example assessment would be to create a simple client server application using sockets)\n"
+            "20.0% Week 6",
+            "Project (Programming assignment(s) using the technologies covered in the lectures.\n"
+            "Example assignment(s) will access if a student can apply design patterns to write distributed code,\n"
+            "use technologies such as RMI and secure communication and information in transit.)\n"
+            "30.0% Week 12"
         ]
     ],
-    "SOFT8009":
+    "SOFT8009": [
         [
-            [
-                "lo1",
-                "lo2",
-                "lo3"
-            ],
-            [
-                "prog1",
-                "prog2"
-            ],
-            [
-                "assess1",
-                "assess2"
-            ]
+            "Apply programming techniques to facilitate the importation, manipulation and cleaning of  data.",
+            "Implement exploratory data analysis techniques and interpret results.",
+            "Choose and employ appropriate visualization techniques for depicting data."
+            "Select and apply basic classification and clustering techniques to a range of  datasets."
+            "Evaluate the accuracy and interpret the results of  classification algorithms."
+        ],
+        [
+            "CA_KCOMP_3",
+            "HO_KCWMP_8",
+            "IY_JCOMP_7"
+        ],
+        [
+            "Open-book Examination: Perform importation, "
+            "cleaning and manipulation of a dataset and perform exploratory data analysis.\n"
+            "20.0% Week 6",
+            "Project: Complete a comprehensive analysis of a real-world dataset "
+            "and produce a report documenting findings and incorporating appropriate visualizations.\n"
+            "30.0% Week 8"
+            "Project: Select and apply appropriate classification techniques to a dataset from a specific application domain."
+            "Findings should be documented and supported with appropriate visualisations.\n"
+            "50.0% Sem End"
         ]
+    ]
 }
 
 # learning_outcome = "1. Evaluate and apply design patterns in the design and development of a distributed system.\n" \
@@ -55,19 +69,20 @@ class ClientThread(threading.Thread):
         print("New connection added: ", client_address)
 
     def run(self):
+
         print("Connection from : ", clientAddress)
 
         while True:
+
             while True:
                 # 2. receive module ID from client
                 data = self.c_socket.recv(1024)
                 if not data:
                     break
                 module_id = data.decode()
-                print("from client", module_id)
+                print("from client... ", module_id)
 
                 if module_id in list(my_dictionary):
-                    # print(list(my_dictionary))
                     # 3. send boolean value to client (for existence of module ID in dictionary)
                     self.c_socket.send(bytes('1', 'UTF-8'))
                     break
@@ -94,15 +109,39 @@ class ClientThread(threading.Thread):
                 #     print(line) # for check
                 #     self.c_socket.send(bytes(line), 'UTF-8')
 
-            # 7. send the Learning Outcomes to the client
-            lo_to_send = pickle.dumps(my_dictionary[module_id][0])
-            self.c_socket.send(lo_to_send)
 
-            # 10. receive the Learning Outcome to be added
-            data = self.c_socket.recv(1024)
-            lo_to_add = data.decode()
-            added_result = str(my_dictionary[module_id][0].append(lo_to_add))
-            self.c_socket.send(bytes(added_result, 'UTF-8'))
+            # 7. send the Learning Outcomes list to the client
+            lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+            self.c_socket.send(lo_list_to_send)
+            while True:
+                # 10. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+                data = self.c_socket.recv(1024)
+                if data.decode == 'error':
+                    break
+                selected_menu_lo = data.decode()
+                if selected_menu_lo == 'add':
+                    # 12-a. receive the Learning Outcome to add from the client
+                    data = self.c_socket.recv(1024)
+                    lo_to_add = data.decode()
+                    print("from client... ", lo_to_add)
+                    # print(my_dictionary[module_id][0]) # for check
+                    my_dictionary[module_id][0].append(lo_to_add)
+                    # print(my_dictionary[module_id][0]) # for check
+                elif selected_menu_lo == 'edit':
+                    # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
+                    data = self.c_socket.recv(1024)
+                    lo_num_to_edit = data.decode()
+                    print("from client... ", lo_num_to_edit)
+                    # 12-e-(2). receive the text of Learning Outcome to overwrite existing text from the client
+                    data = self.c_socket.recv(1024)
+                    lo_txt_to_overwrite = data.decode()
+                    print("from client... ", lo_txt_to_overwrite)
+                    # print(my_dictionary[module_id][0]) # for check
+
+                # 13. send the updated Learning Outcomes list to the client
+                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                self.c_socket.send(updated_lo_list_to_send)
+                print(updated_lo_list_to_send) #for check
 
         print("Client at ", clientAddress, " disconnected...")
 
