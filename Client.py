@@ -55,7 +55,7 @@ while True:
                             add_lo = input("Enter new LO description: ")
                             # 11-a. send the Learning Outcome to be added
                             sock.sendall(bytes(add_lo, 'UTF-8'))
-                            # 14. receive the updated Learning Outcomes list from the server
+                            # 14-a. receive the updated Learning Outcomes list from the server
                             data = sock.recv(1024)
                             updated_lo_list = pickle.loads(data)
                             print(type(updated_lo_list))  # for check
@@ -74,7 +74,7 @@ while True:
                             edit_lo_txt = input("Enter new text: ")
                             # 11-e-(2). send the text of LO to overwrite
                             sock.sendall(bytes(edit_lo_txt, 'UTF-8'))
-                            # 14. receive the updated Learning Outcomes list from the server
+                            # 14-e. receive the updated Learning Outcomes list from the server
                             data = sock.recv(1024)
                             updated_lo_list = pickle.loads(data)
                             print(type(updated_lo_list))  # for check
@@ -83,7 +83,20 @@ while True:
                             for i in range(len(updated_lo_list)):
                                 print(f'{i + 1}. {updated_lo_list[i]}')
                         elif lo_answer == 'D' or lo_answer == 'd':
+                            # 9-d. send the edit request to the server
+                            sock.sendall(bytes("delete", 'UTF-8'))
                             print("you choose Delete option in Learning Outcomes menu")
+                            edit_lo_num = input("Enter LO #: ")
+                            # 11-d. send the number of LO to be deleted
+                            sock.sendall(bytes(edit_lo_num, 'UTF-8'))
+                            # 14-d. receive the updated Learning Outcomes list from the server
+                            data = sock.recv(1024)
+                            updated_lo_list = pickle.loads(data)
+                            print(type(updated_lo_list))  # for check
+                            print(updated_lo_list)  # for check
+                            print("\nUpdated LO List:")
+                            for i in range(len(updated_lo_list)):
+                                print(f'{i + 1}. {updated_lo_list[i]}')
                         elif lo_answer == 'R' or lo_answer == 'r':
                             # 9-r. send the return request to the server
                             sock.sendall(bytes("return", 'UTF-8'))
