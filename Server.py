@@ -1,6 +1,8 @@
+import json
 import pickle
 import socket
 import threading
+import pika
 
 my_dictionary = {
     "SOFT8023": [
@@ -89,30 +91,17 @@ class ClientThread(threading.Thread):
                 # if module_id is not in my_dictionary, loop until it matches
                 self.c_socket.send(bytes('0', 'UTF-8'))
 
-
-            # while True:
-            #     if module_id in list(my_dictionary):
-            #         # print(list(my_dictionary))
-            #         # 3. send boolean value to client (for existence of module ID in dictionary)
-            #         self.c_socket.send(bytes('True', 'UTF-8'))
-            #         break
-            #     else:
-            #         self.c_socket.send(bytes('Enter the correct Module ID!', 'UTF-8'))
-
             while True:
                 # 6. receive the answer for root question from the client
                 data = self.c_socket.recv(1024)
                 if not data:
                     break
-                if data.decode() == "exit":
-                    break
-                # if data.decode() == "lo":
-                    # self.c_socket.send(bytes(str(my_dictionary[module_id][0]), 'UTF-8'))
-                    # for line in my_dictionary[module_id][0]:
-                    #     print(line) # for check
-                    #     self.c_socket.send(bytes(line), 'UTF-8')
+                root_option_selected = data.decode()
 
-                elif data.decode() == "lo":
+                if root_option_selected == "exit":
+                    break
+
+                elif root_option_selected == "lo":
                     while True:
                         # 7-l. send the Learning Outcomes list to the client
                         lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
@@ -121,11 +110,12 @@ class ClientThread(threading.Thread):
                         while True:
                             # 10-l. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
                             data = self.c_socket.recv(1024)
-                            lo_selected = data.decode()
-                            print("check here... if add or not", lo_selected) # for check
-                            if not lo_selected:
+                            sub_option_selected = data.decode()
+                            rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
+                            print("check here... if add or not", sub_option_selected) # for check
+                            if not sub_option_selected:
                                 break
-                            if lo_selected == 'add':
+                            if sub_option_selected == 'add':
                                 # 12-l-a. receive the Learning Outcome to add from the client
                                 data = self.c_socket.recv(1024)
                                 lo_to_add = data.decode()
@@ -137,7 +127,7 @@ class ClientThread(threading.Thread):
                                 updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                 self.c_socket.send(updated_lo_list_to_send)
                                 print(updated_lo_list_to_send)  # for check
-                            elif lo_selected == 'edit':
+                            elif sub_option_selected == 'edit':
                                 # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
                                 data = self.c_socket.recv(1024)
                                 lo_num_to_delete = data.decode()
@@ -153,7 +143,7 @@ class ClientThread(threading.Thread):
                                 updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                 self.c_socket.send(updated_lo_list_to_send)
                                 print(updated_lo_list_to_send)  # for check
-                            elif lo_selected == 'delete':
+                            elif sub_option_selected == 'delete':
                                 # 12-d. receive the number of Learning Outcome to delete from the client
                                 data = self.c_socket.recv(1024)
                                 lo_num_to_delete = data.decode()
@@ -168,13 +158,13 @@ class ClientThread(threading.Thread):
                                 updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                 self.c_socket.send(updated_lo_list_to_send)
                                 print(updated_lo_list_to_send)  # for check
-                            elif lo_selected == 'return':
+                            elif sub_option_selected == 'return':
                                 break
-                            elif lo_selected == 'incorrect':
+                            elif sub_option_selected == 'incorrect':
                                 print("from client... got incorrect answer")
                         break
 
-                elif data.decode() == "course":
+                elif root_option_selected == "course":
                     while True:
                         # 7-c. send the Courses list to the client
                         course_list_to_send = pickle.dumps(my_dictionary[module_id][1])
@@ -184,11 +174,11 @@ class ClientThread(threading.Thread):
                         # while True:
                         #     # 10-c. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
                         #     data = self.c_socket.recv(1024)
-                        #     lo_selected = data.decode()
-                        #     print("check here... if add or not", lo_selected) # for check
-                        #     if not lo_selected:
+                        #     sub_option_selected = data.decode()
+                        #     print("check here... if add or not", sub_option_selected) # for check
+                        #     if not sub_option_selected:
                         #         break
-                        #     if lo_selected == 'add':
+                        #     if sub_option_selected == 'add':
                         #         # 12-l-a. receive the Learning Outcome to add from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_to_add = data.decode()
@@ -200,7 +190,7 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'edit':
+                        #     elif sub_option_selected == 'edit':
                         #         # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_num_to_delete = data.decode()
@@ -216,7 +206,7 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'delete':
+                        #     elif sub_option_selected == 'delete':
                         #         # 12-d. receive the number of Learning Outcome to delete from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_num_to_delete = data.decode()
@@ -231,13 +221,13 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'return':
+                        #     elif sub_option_selected == 'return':
                         #         break
-                        #     elif lo_selected == 'incorrect':
+                        #     elif sub_option_selected == 'incorrect':
                         #         print("from client... got incorrect answer")
                         break
 
-                elif data.decode() == "assess":
+                elif root_option_selected == "assess":
                     while True:
                         # 7-a. send the Assessments list to the client
                         assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
@@ -247,11 +237,11 @@ class ClientThread(threading.Thread):
                         # while True:
                         #     # 10-c. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
                         #     data = self.c_socket.recv(1024)
-                        #     lo_selected = data.decode()
-                        #     print("check here... if add or not", lo_selected) # for check
-                        #     if not lo_selected:
+                        #     sub_option_selected = data.decode()
+                        #     print("check here... if add or not", sub_option_selected) # for check
+                        #     if not sub_option_selected:
                         #         break
-                        #     if lo_selected == 'add':
+                        #     if sub_option_selected == 'add':
                         #         # 12-l-a. receive the Learning Outcome to add from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_to_add = data.decode()
@@ -263,7 +253,7 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'edit':
+                        #     elif sub_option_selected == 'edit':
                         #         # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_num_to_delete = data.decode()
@@ -279,7 +269,7 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'delete':
+                        #     elif sub_option_selected == 'delete':
                         #         # 12-d. receive the number of Learning Outcome to delete from the client
                         #         data = self.c_socket.recv(1024)
                         #         lo_num_to_delete = data.decode()
@@ -294,13 +284,13 @@ class ClientThread(threading.Thread):
                         #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         #         self.c_socket.send(updated_lo_list_to_send)
                         #         print(updated_lo_list_to_send)  # for check
-                        #     elif lo_selected == 'return':
+                        #     elif sub_option_selected == 'return':
                         #         break
-                        #     elif lo_selected == 'incorrect':
+                        #     elif sub_option_selected == 'incorrect':
                         #         print("from client... got incorrect answer")
                         break
 
-                elif data.decode() == "incorrect answer":
+                elif root_option_selected == "incorrect":
                     print("got incorrect answer")
 
             # 16. receive the answer for quit or continue
@@ -335,3 +325,18 @@ while True:
     # print('Connection no. ' + str(counter))
     # print("New connection added: ", clientAddress)
     new_thread.start()
+
+
+    def rabbitmq_record(client_address, module, root_option_selected, sub_option_selected):
+
+        message = [client_address, module, root_option_selected, sub_option_selected]
+
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))  # we could parameterize the host
+        channel = connection.channel()
+        channel.queue_declare(queue='module-stats')
+        channel.basic_publish(exchange='',
+                              routing_key='module-stats',
+                              body=json.dumps(message))
+        connection.close()
+
+

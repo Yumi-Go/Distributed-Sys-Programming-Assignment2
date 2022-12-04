@@ -28,10 +28,10 @@ while response == 'Y' or response == 'y':
         bool_data = bool(int(data))
         print(bool_data)  # for check
         if bool_data:
-            root_answer = ""
+            root_option_selected = ""
             while True:
-                root_answer = input("(L)earning Outcomes, (C)ourses, (A)ssessments or e(X)it? ")
-                if root_answer == 'L' or root_answer == 'l':
+                root_option_selected = input("(L)earning Outcomes, (C)ourses, (A)ssessments or e(X)it? ")
+                if root_option_selected == 'L' or root_option_selected == 'l':
 
                     # 5-l. send the request for Learning Outcomes to the server
                     sock.sendall(bytes("lo", 'UTF-8'))
@@ -45,10 +45,10 @@ while response == 'Y' or response == 'y':
                     for i in range(len(lo_list)):
                         print(f'{i + 1}. {lo_list[i]}')
 
-                    lo_answer = ""
+                    sub_option_selected = ""
                     while True:
-                        lo_answer = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
-                        if lo_answer == 'A' or lo_answer == 'a':
+                        sub_option_selected = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
+                        if sub_option_selected == 'A' or sub_option_selected == 'a':
                             # 9-l-a. send the add request to the server
                             sock.sendall(bytes("add", 'UTF-8'))
                             print("you choose Add option in Learning Outcomes menu")
@@ -64,7 +64,7 @@ while response == 'Y' or response == 'y':
                             for i in range(len(updated_lo_list)):
                                 print(f'{i + 1}. {updated_lo_list[i]}')
 
-                        elif lo_answer == 'E' or lo_answer == 'e':
+                        elif sub_option_selected == 'E' or sub_option_selected == 'e':
                             # 9-l-e. send the edit request to the server
                             sock.sendall(bytes("edit", 'UTF-8'))
                             print("you choose Edit option in Learning Outcomes menu")
@@ -82,7 +82,7 @@ while response == 'Y' or response == 'y':
                             print("\nUpdated LO List:")
                             for i in range(len(updated_lo_list)):
                                 print(f'{i + 1}. {updated_lo_list[i]}')
-                        elif lo_answer == 'D' or lo_answer == 'd':
+                        elif sub_option_selected == 'D' or sub_option_selected == 'd':
                             # 9-l-d. send the edit request to the server
                             sock.sendall(bytes("delete", 'UTF-8'))
                             print("you choose Delete option in Learning Outcomes menu")
@@ -97,7 +97,7 @@ while response == 'Y' or response == 'y':
                             print("\nUpdated LO List:")
                             for i in range(len(updated_lo_list)):
                                 print(f'{i + 1}. {updated_lo_list[i]}')
-                        elif lo_answer == 'R' or lo_answer == 'r':
+                        elif sub_option_selected == 'R' or sub_option_selected == 'r':
                             # 9-l-r. send the return request to the server
                             sock.sendall(bytes("return", 'UTF-8'))
                             print("you choose Return option in Learning Outcomes menu")
@@ -107,7 +107,7 @@ while response == 'Y' or response == 'y':
                             sock.sendall(bytes('incorrect', 'UTF-8'))
                             print("Enter the correct answer")
 
-                if root_answer == 'C' or root_answer == 'c':
+                if root_option_selected == 'C' or root_option_selected == 'c':
 
                     # 5-c. send the request for Courses to the server
                     sock.sendall(bytes("course", 'UTF-8'))
@@ -122,10 +122,10 @@ while response == 'Y' or response == 'y':
                         print(f'{i + 1}. {course_list[i]}')
 
                     # 메일 답장오면 이 부분 살려서 수정할지 결정
-                    # lo_answer = ""
+                    # sub_option_selected = ""
                     # while True:
-                    #     lo_answer = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
-                    #     if lo_answer == 'A' or lo_answer == 'a':
+                    #     sub_option_selected = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
+                    #     if sub_option_selected == 'A' or sub_option_selected == 'a':
                     #         # 9-a. send the add request to the server
                     #         sock.sendall(bytes("add", 'UTF-8'))
                     #         print("you choose Add option in Learning Outcomes menu")
@@ -141,7 +141,7 @@ while response == 'Y' or response == 'y':
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
                     #
-                    #     elif lo_answer == 'E' or lo_answer == 'e':
+                    #     elif sub_option_selected == 'E' or sub_option_selected == 'e':
                     #         # 9-e. send the edit request to the server
                     #         sock.sendall(bytes("edit", 'UTF-8'))
                     #         print("you choose Edit option in Learning Outcomes menu")
@@ -159,7 +159,7 @@ while response == 'Y' or response == 'y':
                     #         print("\nUpdated LO List:")
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
-                    #     elif lo_answer == 'D' or lo_answer == 'd':
+                    #     elif sub_option_selected == 'D' or sub_option_selected == 'd':
                     #         # 9-d. send the edit request to the server
                     #         sock.sendall(bytes("delete", 'UTF-8'))
                     #         print("you choose Delete option in Learning Outcomes menu")
@@ -174,7 +174,7 @@ while response == 'Y' or response == 'y':
                     #         print("\nUpdated LO List:")
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
-                    #     elif lo_answer == 'R' or lo_answer == 'r':
+                    #     elif sub_option_selected == 'R' or sub_option_selected == 'r':
                     #         # 9-r. send the return request to the server
                     #         sock.sendall(bytes("return", 'UTF-8'))
                     #         print("you choose Return option in Learning Outcomes menu")
@@ -184,9 +184,7 @@ while response == 'Y' or response == 'y':
                     #         sock.sendall(bytes('incorrect', 'UTF-8'))
                     #         print("Enter the correct answer")
 
-
-
-                if root_answer == 'A' or root_answer == 'a':
+                if root_option_selected == 'A' or root_option_selected == 'a':
 
                     # 5-a. send the request for Assessments to the server
                     sock.sendall(bytes("assess", 'UTF-8'))
@@ -201,10 +199,10 @@ while response == 'Y' or response == 'y':
                         print(f'{i + 1}. {course_list[i]}')
 
                     # 메일 답장오면 이 부분 살려서 수정할지 결정
-                    # lo_answer = ""
+                    # sub_option_selected = ""
                     # while True:
-                    #     lo_answer = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
-                    #     if lo_answer == 'A' or lo_answer == 'a':
+                    #     sub_option_selected = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
+                    #     if sub_option_selected == 'A' or sub_option_selected == 'a':
                     #         # 9-a. send the add request to the server
                     #         sock.sendall(bytes("add", 'UTF-8'))
                     #         print("you choose Add option in Learning Outcomes menu")
@@ -220,7 +218,7 @@ while response == 'Y' or response == 'y':
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
                     #
-                    #     elif lo_answer == 'E' or lo_answer == 'e':
+                    #     elif sub_option_selected == 'E' or sub_option_selected == 'e':
                     #         # 9-e. send the edit request to the server
                     #         sock.sendall(bytes("edit", 'UTF-8'))
                     #         print("you choose Edit option in Learning Outcomes menu")
@@ -238,7 +236,7 @@ while response == 'Y' or response == 'y':
                     #         print("\nUpdated LO List:")
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
-                    #     elif lo_answer == 'D' or lo_answer == 'd':
+                    #     elif sub_option_selected == 'D' or sub_option_selected == 'd':
                     #         # 9-d. send the edit request to the server
                     #         sock.sendall(bytes("delete", 'UTF-8'))
                     #         print("you choose Delete option in Learning Outcomes menu")
@@ -253,7 +251,7 @@ while response == 'Y' or response == 'y':
                     #         print("\nUpdated LO List:")
                     #         for i in range(len(updated_lo_list)):
                     #             print(f'{i + 1}. {updated_lo_list[i]}')
-                    #     elif lo_answer == 'R' or lo_answer == 'r':
+                    #     elif sub_option_selected == 'R' or sub_option_selected == 'r':
                     #         # 9-r. send the return request to the server
                     #         sock.sendall(bytes("return", 'UTF-8'))
                     #         print("you choose Return option in Learning Outcomes menu")
@@ -263,13 +261,13 @@ while response == 'Y' or response == 'y':
                     #         sock.sendall(bytes('incorrect', 'UTF-8'))
                     #         print("Enter the correct answer")
 
-                elif root_answer == 'X' or root_answer == 'x':
+                elif root_option_selected == 'X' or root_option_selected == 'x':
                     # 5-x. send the request for Exit to the server
                     sock.sendall(bytes("exit", 'UTF-8'))
                     break
                 else:
                     # 5-i. send the incorrect input message to the server
-                    sock.sendall(bytes('incorrect answer', 'UTF-8'))
+                    sock.sendall(bytes('incorrect', 'UTF-8'))
                     print("Enter the correct answer")
 
             print("Goodbye")
