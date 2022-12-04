@@ -29,8 +29,8 @@ my_dictionary = {
         [
             "Apply programming techniques to facilitate the importation, manipulation and cleaning of  data.",
             "Implement exploratory data analysis techniques and interpret results.",
-            "Choose and employ appropriate visualization techniques for depicting data."
-            "Select and apply basic classification and clustering techniques to a range of  datasets."
+            "Choose and employ appropriate visualization techniques for depicting data.",
+            "Select and apply basic classification and clustering techniques to a range of  datasets.",
             "Evaluate the accuracy and interpret the results of  classification algorithms."
         ],
         [
@@ -44,7 +44,7 @@ my_dictionary = {
             "20.0% Week 6",
             "Project: Complete a comprehensive analysis of a real-world dataset "
             "and produce a report documenting findings and incorporating appropriate visualizations.\n"
-            "30.0% Week 8"
+            "30.0% Week 8",
             "Project: Select and apply appropriate classification techniques to a dataset from a specific application domain."
             "Findings should be documented and supported with appropriate visualisations.\n"
             "50.0% Sem End"
@@ -303,7 +303,14 @@ class ClientThread(threading.Thread):
                 elif data.decode() == "incorrect answer":
                     print("got incorrect answer")
 
-            print("Client at ", clientAddress, " disconnected...")
+            # 16. receive the answer for quit or continue
+            data = self.c_socket.recv(1024)
+            if not data:
+                break
+            if data.decode() == 'quit':
+                break
+
+        print("Client at ", clientAddress, " disconnected...")
 
 
 LOCALHOST = "127.0.0.1"
@@ -321,8 +328,10 @@ print("Module System 1.0")
 counter = 0
 
 while True:
-    server.listen(1)
+    server.listen(5)
     my_socket, clientAddress = server.accept()
     counter = counter + 1
     new_thread = ClientThread(clientAddress, my_socket, counter)
+    # print('Connection no. ' + str(counter))
+    # print("New connection added: ", clientAddress)
     new_thread.start()

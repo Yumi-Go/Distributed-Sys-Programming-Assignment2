@@ -15,8 +15,8 @@ data_to_send_moduleID = ""
 #                    "5. Create a distributed object application using RMI, allowing client/server to communicate securely via interfaces and objects.\n"
 
 learning_outcome = []
-
-while True:
+response = 'Y'
+while response == 'Y' or response == 'y':
     while True:
         # 1. send module ID
         data_to_send_moduleID = input("What is the module id? ")
@@ -263,8 +263,6 @@ while True:
                     #         sock.sendall(bytes('incorrect', 'UTF-8'))
                     #         print("Enter the correct answer")
 
-
-
                 elif root_answer == 'X' or root_answer == 'x':
                     # 5-x. send the request for Exit to the server
                     sock.sendall(bytes("exit", 'UTF-8'))
@@ -279,12 +277,18 @@ while True:
         else:
             print("Enter the correct Module ID!")
 
-    data = sock.recv(1024)
-    print('Received', repr(data))
+    response = input("Do you want to continue? (Y/N) ")
+    if response == 'N' or response == 'n':
+        # 15-q. send the request to quit
+        sock.sendall(bytes('quit', 'UTF-8'))
+        break
+    elif response != 'Y' and response != 'y':
+        # 15-c. send the request to continue
+        sock.sendall(bytes('continue', 'UTF-8'))
+    else:
+        print("Enter the correct answer Y or N")
+        # 15-i. send the Incorrect input message
+        sock.sendall(bytes('incorrect', 'UTF-8'))
 
-    data = sock.recv(1024)
-    print(repr(data))
-    # if root_answer == 'L' or root_answer == 'l':
-    #     lo_answer = input(learning_outcome)
 
 sock.close()
