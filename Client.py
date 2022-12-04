@@ -48,10 +48,6 @@ while True:
                     lo_answer = ""
                     while True:
                         lo_answer = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
-                        # lo_valid_answer_list = ['A', 'a', 'E', 'e', 'D', 'd']
-                        # if lo_answer in lo_valid_answer_list:
-                        #     # 9. send the
-                        # sock.sendall(bytes('1', 'UTF-8'))
                         if lo_answer == 'A' or lo_answer == 'a':
                             # 9-a. send the add request to the server
                             sock.sendall(bytes("add", 'UTF-8'))

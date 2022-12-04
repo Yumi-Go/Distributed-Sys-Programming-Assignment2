@@ -147,6 +147,8 @@ class ClientThread(threading.Thread):
                                 lo_txt_to_overwrite = data.decode()
                                 print("from client... ", lo_txt_to_overwrite)
                                 # print(my_dictionary[module_id][0]) # for check
+                                index_to_edit = int(lo_num_to_edit) - 1
+                                my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
                                 # 13. send the updated Learning Outcomes list to the client
                                 updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                 self.c_socket.send(updated_lo_list_to_send)
