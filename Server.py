@@ -237,6 +237,69 @@ class ClientThread(threading.Thread):
                         #         print("from client... got incorrect answer")
                         break
 
+                elif data.decode() == "assess":
+                    while True:
+                        # 7-a. send the Assessments list to the client
+                        assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
+                        self.c_socket.send(assess_list_to_send)
+
+                        # 메일 답장오면 이 부분 살려서 수정할지 결정
+                        # while True:
+                        #     # 10-c. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+                        #     data = self.c_socket.recv(1024)
+                        #     lo_selected = data.decode()
+                        #     print("check here... if add or not", lo_selected) # for check
+                        #     if not lo_selected:
+                        #         break
+                        #     if lo_selected == 'add':
+                        #         # 12-l-a. receive the Learning Outcome to add from the client
+                        #         data = self.c_socket.recv(1024)
+                        #         lo_to_add = data.decode()
+                        #         print("from client... ", lo_to_add)
+                        #         # print(my_dictionary[module_id][0]) # for check
+                        #         my_dictionary[module_id][0].append(lo_to_add)
+                        #         # print(my_dictionary[module_id][0]) # for check
+                        #         # 13-l. send the updated Learning Outcomes list to the client
+                        #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                        #         self.c_socket.send(updated_lo_list_to_send)
+                        #         print(updated_lo_list_to_send)  # for check
+                        #     elif lo_selected == 'edit':
+                        #         # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
+                        #         data = self.c_socket.recv(1024)
+                        #         lo_num_to_delete = data.decode()
+                        #         print("from client... ", lo_num_to_delete)
+                        #         # 12-e-(2). receive the text of Learning Outcome to overwrite existing text from the client
+                        #         data = self.c_socket.recv(1024)
+                        #         lo_txt_to_overwrite = data.decode()
+                        #         print("from client... ", lo_txt_to_overwrite)
+                        #         # print(my_dictionary[module_id][0]) # for check
+                        #         index_to_edit = int(lo_num_to_delete) - 1
+                        #         my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
+                        #         # 13. send the updated Learning Outcomes list to the client
+                        #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                        #         self.c_socket.send(updated_lo_list_to_send)
+                        #         print(updated_lo_list_to_send)  # for check
+                        #     elif lo_selected == 'delete':
+                        #         # 12-d. receive the number of Learning Outcome to delete from the client
+                        #         data = self.c_socket.recv(1024)
+                        #         lo_num_to_delete = data.decode()
+                        #         print("from client... ", lo_num_to_delete)
+                        #         # print(my_dictionary[module_id][0]) # for check
+                        #         index_to_edit = int(lo_num_to_delete) - 1
+                        #         del my_dictionary[module_id][0][int(index_to_edit)]
+                        #         print("after delete") # for check
+                        #         print(my_dictionary[module_id][0]) # for check
+                        #
+                        #         # 13. send the updated Learning Outcomes list to the client
+                        #         updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                        #         self.c_socket.send(updated_lo_list_to_send)
+                        #         print(updated_lo_list_to_send)  # for check
+                        #     elif lo_selected == 'return':
+                        #         break
+                        #     elif lo_selected == 'incorrect':
+                        #         print("from client... got incorrect answer")
+                        break
+
                 elif data.decode() == "incorrect answer":
                     print("got incorrect answer")
 
