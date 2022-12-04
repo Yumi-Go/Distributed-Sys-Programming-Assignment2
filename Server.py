@@ -99,51 +99,67 @@ class ClientThread(threading.Thread):
             #     else:
             #         self.c_socket.send(bytes('Enter the correct Module ID!', 'UTF-8'))
 
-            # 6. receive the request for Learning Outcomes from the client
-            data = self.c_socket.recv(1024)
-            if not data:
-                break
-            # if data.decode() == "request LO":
-                # self.c_socket.send(bytes(str(my_dictionary[module_id][0]), 'UTF-8'))
-                # for line in my_dictionary[module_id][0]:
-                #     print(line) # for check
-                #     self.c_socket.send(bytes(line), 'UTF-8')
-
-
-            # 7. send the Learning Outcomes list to the client
-            lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-            self.c_socket.send(lo_list_to_send)
             while True:
-                # 10. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+                # 6. receive the answer for root question from the client
                 data = self.c_socket.recv(1024)
-                if data.decode == 'error':
+                if not data:
                     break
-                selected_menu_lo = data.decode()
-                if selected_menu_lo == 'add':
-                    # 12-a. receive the Learning Outcome to add from the client
-                    data = self.c_socket.recv(1024)
-                    lo_to_add = data.decode()
-                    print("from client... ", lo_to_add)
-                    # print(my_dictionary[module_id][0]) # for check
-                    my_dictionary[module_id][0].append(lo_to_add)
-                    # print(my_dictionary[module_id][0]) # for check
-                elif selected_menu_lo == 'edit':
-                    # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
-                    data = self.c_socket.recv(1024)
-                    lo_num_to_edit = data.decode()
-                    print("from client... ", lo_num_to_edit)
-                    # 12-e-(2). receive the text of Learning Outcome to overwrite existing text from the client
-                    data = self.c_socket.recv(1024)
-                    lo_txt_to_overwrite = data.decode()
-                    print("from client... ", lo_txt_to_overwrite)
-                    # print(my_dictionary[module_id][0]) # for check
+                if data.decode() == "exit":
+                    break
+                # if data.decode() == "lo":
+                    # self.c_socket.send(bytes(str(my_dictionary[module_id][0]), 'UTF-8'))
+                    # for line in my_dictionary[module_id][0]:
+                    #     print(line) # for check
+                    #     self.c_socket.send(bytes(line), 'UTF-8')
 
-                # 13. send the updated Learning Outcomes list to the client
-                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                self.c_socket.send(updated_lo_list_to_send)
-                print(updated_lo_list_to_send) #for check
+                elif data.decode() == "lo":
+                    while True:
+                        # 7. send the Learning Outcomes list to the client
+                        lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                        self.c_socket.send(lo_list_to_send)
 
-        print("Client at ", clientAddress, " disconnected...")
+                        while True:
+                            # 10. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+                            data = self.c_socket.recv(1024)
+                            lo_selected_option = data.decode()
+                            print("check here... if add or not", lo_selected_option) # for check
+                            if not lo_selected_option:
+                                break
+                            if lo_selected_option == 'add':
+                                # 12-a. receive the Learning Outcome to add from the client
+                                data = self.c_socket.recv(1024)
+                                lo_to_add = data.decode()
+                                print("from client... ", lo_to_add)
+                                # print(my_dictionary[module_id][0]) # for check
+                                my_dictionary[module_id][0].append(lo_to_add)
+                                # print(my_dictionary[module_id][0]) # for check
+                                # 13. send the updated Learning Outcomes list to the client
+                                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                                self.c_socket.send(updated_lo_list_to_send)
+                                print(updated_lo_list_to_send)  # for check
+                            elif lo_selected_option == 'edit':
+                                # 12-e-(1). receive the number of Learning Outcome to overwrite from the client
+                                data = self.c_socket.recv(1024)
+                                lo_num_to_edit = data.decode()
+                                print("from client... ", lo_num_to_edit)
+                                # 12-e-(2). receive the text of Learning Outcome to overwrite existing text from the client
+                                data = self.c_socket.recv(1024)
+                                lo_txt_to_overwrite = data.decode()
+                                print("from client... ", lo_txt_to_overwrite)
+                                # print(my_dictionary[module_id][0]) # for check
+                                # 13. send the updated Learning Outcomes list to the client
+                                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                                self.c_socket.send(updated_lo_list_to_send)
+                                print(updated_lo_list_to_send)  # for check
+                            elif lo_selected_option == 'return':
+                                break
+                            elif lo_selected_option == 'incorrect':
+                                print("from client... got incorrect answer")
+                        break
+                elif data.decode() == "incorrect answer":
+                    print("got incorrect answer")
+
+            print("Client at ", clientAddress, " disconnected...")
 
 
 LOCALHOST = "127.0.0.1"
