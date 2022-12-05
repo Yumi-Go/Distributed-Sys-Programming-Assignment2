@@ -54,13 +54,6 @@ my_dictionary = {
     ]
 }
 
-# learning_outcome = "1. Evaluate and apply design patterns in the design and development of a distributed system.\n" \
-#                    "2. Assess and apply different architectural patterns in a distributed system.\n" \
-#                    "3. Critically access and apply threading in a distributed application.\n" \
-#                    "4. Debug a distributed client/server application, identifying object properties and variables at run-time.\n" \
-#                    "5. Create a distributed object application using RMI, allowing client/server to communicate securely via interfaces and objects.\n"
-
-
 
 class ClientThread(threading.Thread):
 
@@ -71,110 +64,113 @@ class ClientThread(threading.Thread):
         print("New connection added: ", client_address)
 
     def run(self):
-
         print("Connection from : ", clientAddress)
 
         while True:
+            # 2. receive module ID from client
+            data = self.c_socket.recv(1024)
+            if not data:
+                print("No data recognized")
 
-            while True:
-                # 2. receive module ID from client
-                data = self.c_socket.recv(1024)
-                if not data:
-                    break
-                module_id = data.decode()
-                print("from client... ", module_id)
+            module_id = data.decode()
+            print("from client... ", module_id)
 
-                if module_id in list(my_dictionary):
-                    # 3. send boolean value to client (for existence of module ID in dictionary)
-                    self.c_socket.send(bytes('1', 'UTF-8'))
-                    break
-                # if module_id is not in my_dictionary, loop until it matches
-                self.c_socket.send(bytes('0', 'UTF-8'))
+            if module_id in list(my_dictionary):
+                # 3. send boolean value to client (for existence of module ID in dictionary)
+                self.c_socket.send(bytes('1', 'UTF-8'))
+                break
+            # if module_id is not in my_dictionary, loop until it matches
+            self.c_socket.send(bytes('0', 'UTF-8'))
 
-            while True:
-                # 6. receive the answer for root question from the client
-                data = self.c_socket.recv(1024)
-                if not data:
-                    break
-                root_option_selected = data.decode()
+        while True:
+            # 6. receive the answer for root question from the client
+            data = self.c_socket.recv(1024)
+            if not data:
+                break
+            root_option_selected = data.decode()
 
-                if root_option_selected == "exit":
-                    break
-                elif root_option_selected == "lo":
+            if root_option_selected == "exit":
+                break
+            elif root_option_selected == "lo":
+                while True:
                     while True:
                         # 7-l. send the Learning Outcomes list to the client
                         lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                         self.c_socket.send(lo_list_to_send)
-                        while True:
-                            # 10. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+
+                        # 10. receive the Learning Outcome's menu (among Add, Edit, Delete, or Return) from the client
+                        data = self.c_socket.recv(1024)
+                        sub_option_selected = data.decode()
+                        rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
+                        if not sub_option_selected:
+                            break
+                        if sub_option_selected == 'add':
+                            # 12-a. receive the Learning Outcome to add from the client
                             data = self.c_socket.recv(1024)
-                            sub_option_selected = data.decode()
-                            rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
-                            if not sub_option_selected:
-                                break
-                            if sub_option_selected == 'add':
-                                # 12-a. receive the Learning Outcome to add from the client
-                                data = self.c_socket.recv(1024)
-                                lo_to_add = data.decode()
-                                print("from client... ", lo_to_add)
-                                my_dictionary[module_id][0].append(lo_to_add)
-                                # 13-a. send the updated Learning Outcomes list to the client
-                                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                                self.c_socket.send(updated_lo_list_to_send)
-                            elif sub_option_selected == 'edit':
-                                # 12-e. receive the number of Learning Outcome to overwrite from the client
+                            lo_to_add = data.decode()
+                            print("from client... ", lo_to_add)
+                            my_dictionary[module_id][0].append(lo_to_add)
+                            # 13-a. send the updated Learning Outcomes list to the client
+                            updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                            self.c_socket.send(updated_lo_list_to_send)
+                        elif sub_option_selected == 'edit':
+                            # 12-e. receive the number of Learning Outcome to overwrite from the client
+                            data = self.c_socket.recv(1024)
+                            lo_num_to_edit = data.decode()
+                            print("from client... ", lo_num_to_edit)
+                            # 12-e. receive the text of Learning Outcome to overwrite existing text from the client
+                            data = self.c_socket.recv(1024)
+                            lo_txt_to_overwrite = data.decode()
+                            print("from client... ", lo_txt_to_overwrite)
+                            index_to_edit = int(lo_num_to_edit) - 1
+                            my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
+                            # 13-a. send the updated Learning Outcomes list to the client
+                            updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                            self.c_socket.send(updated_lo_list_to_send)
+                        elif sub_option_selected == 'delete':
+                            if len(my_dictionary[module_id][0]) > 0:
+                                recent_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                                # 11-d. send the recent LO list to the client if LO list is not empty
+                                self.c_socket.send(recent_lo_list_to_send)
+
+                                # 14-d. receive the number of Learning Outcome to delete from the client
                                 data = self.c_socket.recv(1024)
                                 lo_num_to_delete = data.decode()
                                 print("from client... ", lo_num_to_delete)
-                                # 12-e. receive the text of Learning Outcome to overwrite existing text from the client
-                                data = self.c_socket.recv(1024)
-                                lo_txt_to_overwrite = data.decode()
-                                print("from client... ", lo_txt_to_overwrite)
-                                index_to_edit = int(lo_num_to_delete) - 1
-                                my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
-                                # 13-a. send the updated Learning Outcomes list to the client
+
+                                print(len(my_dictionary[module_id][0])) # for check
+
+                                index_to_delete = int(lo_num_to_delete) - 1
+                                del my_dictionary[module_id][0][int(index_to_delete)]
+
+                                # 15-d. send the updated Learning Outcomes list to the client
                                 updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                 self.c_socket.send(updated_lo_list_to_send)
-                            elif sub_option_selected == 'delete':
-                                # 12-d. receive the number of Learning Outcome to delete from the client
-                                data = self.c_socket.recv(1024)
-                                lo_num_to_delete = data.decode()
-                                print("from client... ", lo_num_to_delete)
-                                index_to_edit = int(lo_num_to_delete) - 1
-                                del my_dictionary[module_id][0][int(index_to_edit)]
-                                # 13-d. send the updated Learning Outcomes list to the client
-                                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                                self.c_socket.send(updated_lo_list_to_send)
-                            elif sub_option_selected == 'return':
+                            else:
+                                print("Learning Outcomes List is empty")
                                 break
-                            elif sub_option_selected == 'incorrect':
-                                print("from client... got incorrect answer")
-                        break
-                elif root_option_selected == "course":
-                    rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
-                    while True:
-                        # 7-c. send the Courses list to the client
-                        course_list_to_send = pickle.dumps(my_dictionary[module_id][1])
-                        self.c_socket.send(course_list_to_send)
-                        break
-                elif root_option_selected == "assess":
-                    rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
-                    while True:
-                        # 7-a. send the Assessments list to the client
-                        assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
-                        self.c_socket.send(assess_list_to_send)
-                        break
-                elif root_option_selected == "incorrect":
-                    print("got incorrect answer")
+                        elif sub_option_selected == 'return':
+                            break
+                        elif sub_option_selected == 'incorrect':
+                            print("from client... got incorrect answer")
+            elif root_option_selected == "course":
+                rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
+                while True:
+                    # 7-c. send the Courses list to the client
+                    course_list_to_send = pickle.dumps(my_dictionary[module_id][1])
+                    self.c_socket.send(course_list_to_send)
+                    break
+            elif root_option_selected == "assess":
+                rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
+                while True:
+                    # 7-a. send the Assessments list to the client
+                    assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
+                    self.c_socket.send(assess_list_to_send)
+                    break
+            elif root_option_selected == "incorrect":
+                print("got incorrect answer")
 
-            # 16. receive the answer for quit or continue
-            data = self.c_socket.recv(1024)
-            if not data:
-                break
-            if data.decode() == 'quit':
-                break
-
-        print("Client at ", clientAddress, " disconnected...")
+            print("Client at ", clientAddress, " disconnected...")
 
 
 LOCALHOST = "127.0.0.1"
