@@ -73,7 +73,7 @@ class ClientThread(threading.Thread):
             if not data:
                 print("No data recognized")
 
-            module_id = data.decode()
+            module_id = data.decode().upper()
             print("from client... ", module_id)
 
             if module_id in list(my_dictionary):

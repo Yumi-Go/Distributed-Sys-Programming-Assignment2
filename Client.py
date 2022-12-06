@@ -18,7 +18,7 @@ while True:
         data = sock.recv(1024)
         bool_data = bool(int(data))
         if bool_data:
-            root_option_selected = ""
+            # root_option_selected = ""
             while True:
                 while True:
                     root_option_selected = input("(L)earning Outcomes, (C)ourses, (A)ssessments or e(X)it? ")
@@ -34,7 +34,7 @@ while True:
                         # 5-l. send the request for Learning Outcomes to the server
                         sock.sendall(bytes("lo", 'UTF-8'))
 
-                        sub_option_selected = ""
+                        # sub_option_selected = ""
                         while True:
                             # 8-l. receive the Learning Outcomes list from the server
                             data = sock.recv(1024)
@@ -92,7 +92,7 @@ while True:
                                 # 12-l-d. receive the recent lo list from the server
                                 data = sock.recv(1024)
                                 recent_lo_list = pickle.loads(data)
-                                print(recent_lo_list)  # for check
+                                # print(recent_lo_list)  # for check
                                 if len(recent_lo_list) == 0:
                                     print("Learning Outcomes List is empty!")
                                     break
