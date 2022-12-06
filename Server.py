@@ -88,7 +88,7 @@ class ClientThread(threading.Thread):
                 # 6. receive the answer for root question from the client
                 data = self.c_socket.recv(1024)
                 root_option_selected = data.decode()
-                print("from client... ", root_option_selected) # for check
+                print("from client... ", root_option_selected)
                 if root_option_selected == "exit":
                     break
                 if root_option_selected == 'none':
@@ -121,20 +121,6 @@ class ClientThread(threading.Thread):
                             if len(my_dictionary[module_id][0]) > 0:
 
                                 if data:
-                                    # # 14-e. receive the number of Learning Outcome to overwrite from the client
-                                    # data = self.c_socket.recv(1024)
-                                    # lo_num_to_edit = data.decode()
-                                    # print("from client... ", lo_num_to_edit)
-                                    # # 14-e. receive the text of Learning Outcome to overwrite from the client
-                                    # data = self.c_socket.recv(1024)
-                                    # lo_txt_to_overwrite = data.decode()
-                                    # print("from client... ", lo_txt_to_overwrite)
-                                    #
-                                    # print(len(my_dictionary[module_id][0]))  # for check
-                                    #
-                                    # index_to_edit = int(lo_num_to_edit) - 1
-                                    # my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
-
                                     # 14-e. receive the number, text of Learning Outcome to overwrite from the client
                                     data = self.c_socket.recv(1024)
                                     lo_num_text_to_edit = pickle.loads(data)
@@ -162,9 +148,6 @@ class ClientThread(threading.Thread):
                                 if data:
                                     lo_num_to_delete = data.decode()
                                     print("from client... ", lo_num_to_delete)
-
-                                    print(len(my_dictionary[module_id][0])) # for check
-
                                     index_to_delete = int(lo_num_to_delete) - 1
                                     del my_dictionary[module_id][0][int(index_to_delete)]
 

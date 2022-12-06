@@ -61,7 +61,6 @@ while True:
                                 # 12-l-d. receive the recent lo list from the server
                                 data = sock.recv(1024)
                                 recent_lo_list = pickle.loads(data)
-                                # print(recent_lo_list)  # for check
                                 if len(recent_lo_list) == 0:
                                     print("Learning Outcomes List is empty!")
                                     break
@@ -107,7 +106,6 @@ while True:
                                 # 12-l-d. receive the recent lo list from the server
                                 data = sock.recv(1024)
                                 recent_lo_list = pickle.loads(data)
-                                # print(recent_lo_list)  # for check
                                 if len(recent_lo_list) == 0:
                                     print("Learning Outcomes List is empty!")
                                     break
