@@ -92,7 +92,7 @@ class ClientThread(threading.Thread):
                 if root_option_selected == "exit":
                     break
                 if root_option_selected == 'none':
-                    print("from client... No root answer data")
+                    print("from client... No data")
                 elif root_option_selected == "lo":
                     while True:
                         # 7-l. send the Learning Outcomes list to the client
@@ -104,7 +104,7 @@ class ClientThread(threading.Thread):
                         sub_option_selected = data.decode()
                         rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
                         if not sub_option_selected:
-                            print("from client... no sub answer Data")
+                            print("from client... No data")
                         if sub_option_selected == 'add':
                             # 12-a. receive the Learning Outcome to add from the client
                             data = self.c_socket.recv(1024)
@@ -133,7 +133,7 @@ class ClientThread(threading.Thread):
                                     updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                     self.c_socket.send(updated_lo_list_to_send)
                                 else:
-                                    print("from client... nothing")
+                                    print("from client... No data")
                             else:
                                 print("Learning Outcomes List is empty")
                                 break
@@ -155,14 +155,14 @@ class ClientThread(threading.Thread):
                                     updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                                     self.c_socket.send(updated_lo_list_to_send)
                                 else:
-                                    print("from client... nothing")
+                                    print("from client... No data")
                             else:
                                 print("Learning Outcomes List is empty")
                                 break
                         elif sub_option_selected == 'return':
                             break
                         elif sub_option_selected == 'incorrect':
-                            print("from client... got incorrect answer in sub question")
+                            print("from client... got incorrect answer")
                 elif root_option_selected == "course":
                     rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
                     while True:
@@ -178,8 +178,8 @@ class ClientThread(threading.Thread):
                         self.c_socket.send(assess_list_to_send)
                         break
                 elif root_option_selected == "incorrect":
-                    print("got incorrect answer in root question")
-            break # ??
+                    print("got incorrect answer")
+            break
         print("Client at ", clientAddress, " disconnected...")
 
 

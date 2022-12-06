@@ -142,9 +142,9 @@ while True:
                                 # 9-l-i. send the Incorrect input message to the server
                                 sock.sendall(bytes('incorrect', 'UTF-8'))
                                 if sub_option_selected != "":
-                                    print("Enter the correct answer (sub question)")
+                                    print("Enter the correct answer")
                                 else:
-                                    print("Enter the answer (sub question)")
+                                    print("Enter the answer")
 
                     elif root_option_selected == 'C' or root_option_selected == 'c':
 
@@ -172,7 +172,7 @@ while True:
                     else:
                         # 5-i. send the incorrect input message to the server
                         sock.sendall(bytes('incorrect', 'UTF-8'))
-                        print("Enter the correct answer (root question)")
+                        print("Enter the correct answer")
                 break
             print("Goodbye")
             break
