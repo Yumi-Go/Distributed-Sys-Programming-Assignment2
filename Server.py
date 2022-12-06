@@ -115,19 +115,42 @@ class ClientThread(threading.Thread):
                             updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                             self.c_socket.send(updated_lo_list_to_send)
                         elif sub_option_selected == 'edit':
-                            # 12-e. receive the number of Learning Outcome to overwrite from the client
-                            data = self.c_socket.recv(1024)
-                            lo_num_to_edit = data.decode()
-                            print("from client... ", lo_num_to_edit)
-                            # 12-e. receive the text of Learning Outcome to overwrite existing text from the client
-                            data = self.c_socket.recv(1024)
-                            lo_txt_to_overwrite = data.decode()
-                            print("from client... ", lo_txt_to_overwrite)
-                            index_to_edit = int(lo_num_to_edit) - 1
-                            my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
-                            # 13-a. send the updated Learning Outcomes list to the client
-                            updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                            self.c_socket.send(updated_lo_list_to_send)
+                            recent_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                            # 11-e. send the recent LO list to the client if LO list is not empty
+                            self.c_socket.send(recent_lo_list_to_send)
+                            if len(my_dictionary[module_id][0]) > 0:
+
+                                if data:
+                                    # # 14-e. receive the number of Learning Outcome to overwrite from the client
+                                    # data = self.c_socket.recv(1024)
+                                    # lo_num_to_edit = data.decode()
+                                    # print("from client... ", lo_num_to_edit)
+                                    # # 14-e. receive the text of Learning Outcome to overwrite from the client
+                                    # data = self.c_socket.recv(1024)
+                                    # lo_txt_to_overwrite = data.decode()
+                                    # print("from client... ", lo_txt_to_overwrite)
+                                    #
+                                    # print(len(my_dictionary[module_id][0]))  # for check
+                                    #
+                                    # index_to_edit = int(lo_num_to_edit) - 1
+                                    # my_dictionary[module_id][0][int(index_to_edit)] = lo_txt_to_overwrite
+
+                                    # 14-e. receive the number, text of Learning Outcome to overwrite from the client
+                                    data = self.c_socket.recv(1024)
+                                    lo_num_text_to_edit = pickle.loads(data)
+                                    print("from client... ", lo_num_text_to_edit)
+
+                                    index_to_edit = int(lo_num_text_to_edit[0]) - 1
+                                    my_dictionary[module_id][0][int(index_to_edit)] = lo_num_text_to_edit[1]
+
+                                    # 15-e. send the updated Learning Outcomes list to the client
+                                    updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                                    self.c_socket.send(updated_lo_list_to_send)
+                                else:
+                                    print("from client... nothing")
+                            else:
+                                print("Learning Outcomes List is empty")
+                                break
                         elif sub_option_selected == 'delete':
                             recent_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                             # 11-d. send the recent LO list to the client if LO list is not empty

@@ -58,23 +58,40 @@ while True:
                             elif sub_option_selected == 'E' or sub_option_selected == 'e':
                                 # 9-l-e. send the edit request to the server
                                 sock.sendall(bytes("edit", 'UTF-8'))
-                                print("you choose Edit option in Learning Outcomes menu")
-                                while True:
-                                    edit_lo_num = input("Enter LO #: ")
-                                    if not edit_lo_num:
-                                        print("Enter the answer")
-                                    else:
-                                        if not edit_lo_num.isdigit():
-                                            print("Enter the Integer number")
+                                # 12-l-d. receive the recent lo list from the server
+                                data = sock.recv(1024)
+                                recent_lo_list = pickle.loads(data)
+                                # print(recent_lo_list)  # for check
+                                if len(recent_lo_list) == 0:
+                                    print("Learning Outcomes List is empty!")
+                                    break
+                                else:
+                                    print("you choose Edit option in Learning Outcomes menu")
+                                    while True:
+                                        edit_lo_num = input("Enter LO #: ")
+                                        if not edit_lo_num:
+                                            print("Enter the answer")
                                         else:
-                                            if len(lo_list) > 0:
-                                                if 0 < int(edit_lo_num) <= len(lo_list):
-                                                    # 11-l-e. send the number of LO to be overwritten
-                                                    sock.sendall(bytes(edit_lo_num, 'UTF-8'))
+                                            if not edit_lo_num.isdigit():
+                                                print("Enter the Integer number")
+                                            else:
+                                                if 0 < int(edit_lo_num) <= len(recent_lo_list):
+                                                    lo_num_text = ["", ""]
+                                                    # # 13-l-d. send the number of LO to be edited
+                                                    # sock.sendall(bytes(edit_lo_num, 'UTF-8'))
                                                     edit_lo_txt = input("Enter new text: ")
-                                                    # 11-l-e. send the text of LO to overwrite
-                                                    sock.sendall(bytes(edit_lo_txt, 'UTF-8'))
-                                                    # 14-l-e. receive the updated Learning Outcomes list from the server
+                                                    # # 13-l-d. send the text of LO to be edited
+                                                    # sock.sendall(bytes(edit_lo_txt, 'UTF-8'))
+
+                                                    # 13-l-d. send the num, text of LO to be edited
+                                                    lo_num_text[0] = edit_lo_num
+                                                    lo_num_text[1] = edit_lo_txt
+
+                                                    lo_num_text_to_send = pickle.dumps(lo_num_text)
+                                                    sock.sendall(lo_num_text_to_send)
+
+
+                                                    # 16-l-d. receive the updated Learning Outcomes list from the server
                                                     data = sock.recv(1024)
                                                     updated_lo_list = pickle.loads(data)
                                                     print("\nUpdated LO List:")
@@ -83,8 +100,6 @@ while True:
                                                     break
                                                 else:
                                                     print("Enter the correct number of LO")
-                                            else:
-                                                print("LO list is empty! No line to edit!")
 
                             elif sub_option_selected == 'D' or sub_option_selected == 'd':
                                 # 9-l-d. send the edit request to the server
