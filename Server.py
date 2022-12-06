@@ -2,6 +2,7 @@ import json
 import pickle
 import socket
 import threading
+
 import pika
 
 my_dictionary = {
@@ -86,8 +87,10 @@ class ClientThread(threading.Thread):
             # 6. receive the answer for root question from the client
             data = self.c_socket.recv(1024)
             if not data:
-                break
+                print("from client... No Data")
             root_option_selected = data.decode()
+
+            print("from client... ", root_option_selected) # for check
 
             if root_option_selected == "exit":
                 break
@@ -103,7 +106,7 @@ class ClientThread(threading.Thread):
                         sub_option_selected = data.decode()
                         rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
                         if not sub_option_selected:
-                            break
+                            print("from client... No Data")
                         if sub_option_selected == 'add':
                             # 12-a. receive the Learning Outcome to add from the client
                             data = self.c_socket.recv(1024)
@@ -128,24 +131,27 @@ class ClientThread(threading.Thread):
                             updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
                             self.c_socket.send(updated_lo_list_to_send)
                         elif sub_option_selected == 'delete':
+                            recent_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                            # 11-d. send the recent LO list to the client if LO list is not empty
+                            self.c_socket.send(recent_lo_list_to_send)
                             if len(my_dictionary[module_id][0]) > 0:
-                                recent_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                                # 11-d. send the recent LO list to the client if LO list is not empty
-                                self.c_socket.send(recent_lo_list_to_send)
-
                                 # 14-d. receive the number of Learning Outcome to delete from the client
                                 data = self.c_socket.recv(1024)
-                                lo_num_to_delete = data.decode()
-                                print("from client... ", lo_num_to_delete)
 
-                                print(len(my_dictionary[module_id][0])) # for check
+                                if data:
+                                    lo_num_to_delete = data.decode()
+                                    print("from client... ", lo_num_to_delete)
 
-                                index_to_delete = int(lo_num_to_delete) - 1
-                                del my_dictionary[module_id][0][int(index_to_delete)]
+                                    print(len(my_dictionary[module_id][0])) # for check
 
-                                # 15-d. send the updated Learning Outcomes list to the client
-                                updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
-                                self.c_socket.send(updated_lo_list_to_send)
+                                    index_to_delete = int(lo_num_to_delete) - 1
+                                    del my_dictionary[module_id][0][int(index_to_delete)]
+
+                                    # 15-d. send the updated Learning Outcomes list to the client
+                                    updated_lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
+                                    self.c_socket.send(updated_lo_list_to_send)
+                                else:
+                                    print("from client... nothing")
                             else:
                                 print("Learning Outcomes List is empty")
                                 break
@@ -170,7 +176,7 @@ class ClientThread(threading.Thread):
             elif root_option_selected == "incorrect":
                 print("got incorrect answer")
 
-            print("Client at ", clientAddress, " disconnected...")
+        print("Client at ", clientAddress, " disconnected...")
 
 
 LOCALHOST = "127.0.0.1"
@@ -185,6 +191,7 @@ print("Module System 1.0")
 counter = 0
 
 while True:
+    # time.sleep(.10)
     server.listen(5)
     my_socket, clientAddress = server.accept()
     counter = counter + 1

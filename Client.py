@@ -93,7 +93,7 @@ while True:
                         elif sub_option_selected == 'D' or sub_option_selected == 'd':
                             # 9-l-d. send the edit request to the server
                             sock.sendall(bytes("delete", 'UTF-8'))
-                            # 12-l-d. receive the recent lo list from the server if list is not empty
+                            # 12-l-d. receive the recent lo list from the server
                             data = sock.recv(1024)
                             recent_lo_list = pickle.loads(data)
                             print(recent_lo_list)  # for check
