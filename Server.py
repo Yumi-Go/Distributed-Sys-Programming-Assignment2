@@ -84,18 +84,16 @@ class ClientThread(threading.Thread):
             self.c_socket.send(bytes('0', 'UTF-8'))
 
         while True:
-            # 6. receive the answer for root question from the client
-            data = self.c_socket.recv(1024)
-            if not data:
-                print("from client... No Data")
-            root_option_selected = data.decode()
-
-            print("from client... ", root_option_selected) # for check
-
-            if root_option_selected == "exit":
-                break
-            elif root_option_selected == "lo":
-                while True:
+            while True:
+                # 6. receive the answer for root question from the client
+                data = self.c_socket.recv(1024)
+                root_option_selected = data.decode()
+                print("from client... ", root_option_selected) # for check
+                if root_option_selected == "exit":
+                    break
+                if root_option_selected == 'none':
+                    print("from client... No root answer data")
+                elif root_option_selected == "lo":
                     while True:
                         # 7-l. send the Learning Outcomes list to the client
                         lo_list_to_send = pickle.dumps(my_dictionary[module_id][0])
@@ -106,7 +104,7 @@ class ClientThread(threading.Thread):
                         sub_option_selected = data.decode()
                         rabbitmq_record(clientAddress, module_id, root_option_selected, sub_option_selected)
                         if not sub_option_selected:
-                            print("from client... No Data")
+                            print("from client... no sub answer Data")
                         if sub_option_selected == 'add':
                             # 12-a. receive the Learning Outcome to add from the client
                             data = self.c_socket.recv(1024)
@@ -158,24 +156,24 @@ class ClientThread(threading.Thread):
                         elif sub_option_selected == 'return':
                             break
                         elif sub_option_selected == 'incorrect':
-                            print("from client... got incorrect answer")
-            elif root_option_selected == "course":
-                rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
-                while True:
-                    # 7-c. send the Courses list to the client
-                    course_list_to_send = pickle.dumps(my_dictionary[module_id][1])
-                    self.c_socket.send(course_list_to_send)
-                    break
-            elif root_option_selected == "assess":
-                rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
-                while True:
-                    # 7-a. send the Assessments list to the client
-                    assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
-                    self.c_socket.send(assess_list_to_send)
-                    break
-            elif root_option_selected == "incorrect":
-                print("got incorrect answer")
-
+                            print("from client... got incorrect answer in sub question")
+                elif root_option_selected == "course":
+                    rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
+                    while True:
+                        # 7-c. send the Courses list to the client
+                        course_list_to_send = pickle.dumps(my_dictionary[module_id][1])
+                        self.c_socket.send(course_list_to_send)
+                        break
+                elif root_option_selected == "assess":
+                    rabbitmq_record(clientAddress, module_id, root_option_selected, "N/A")
+                    while True:
+                        # 7-a. send the Assessments list to the client
+                        assess_list_to_send = pickle.dumps(my_dictionary[module_id][2])
+                        self.c_socket.send(assess_list_to_send)
+                        break
+                elif root_option_selected == "incorrect":
+                    print("got incorrect answer in root question")
+            break # ??
         print("Client at ", clientAddress, " disconnected...")
 
 
@@ -192,7 +190,7 @@ counter = 0
 
 while True:
     # time.sleep(.10)
-    server.listen(5)
+    server.listen(1)
     my_socket, clientAddress = server.accept()
     counter = counter + 1
     new_thread = ClientThread(clientAddress, my_socket, counter)
