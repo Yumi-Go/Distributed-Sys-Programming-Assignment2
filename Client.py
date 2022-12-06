@@ -20,9 +20,7 @@ while True:
         if bool_data:
             root_option_selected = ""
             while True:
-
-                while True: # ??
-
+                while True:
                     root_option_selected = input("(L)earning Outcomes, (C)ourses, (A)ssessments or e(X)it? ")
                     if root_option_selected == 'X' or root_option_selected == 'x':
                         # 5-x. send the request for Exit to the server
@@ -36,21 +34,11 @@ while True:
                         # 5-l. send the request for Learning Outcomes to the server
                         sock.sendall(bytes("lo", 'UTF-8'))
 
-                        # # 8-l. receive the Learning Outcomes list from the server
-                        # data = sock.recv(1024)
-                        # lo_list = pickle.loads(data)
-                        # print("\nLO list")
-                        # for i in range(len(lo_list)):
-                        #     print(f'{i + 1}. {lo_list[i]}')
-
                         sub_option_selected = ""
                         while True:
                             # 8-l. receive the Learning Outcomes list from the server
                             data = sock.recv(1024)
                             lo_list = pickle.loads(data)
-                            print("\nLO list")
-                            for i in range(len(lo_list)):
-                                print(f'{i + 1}. {lo_list[i]}')
 
                             sub_option_selected = input("(A)dd, (E)dit, (D)elete or (R)eturn? ")
                             if sub_option_selected == 'A' or sub_option_selected == 'a':
